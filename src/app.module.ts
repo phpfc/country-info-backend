@@ -10,4 +10,4 @@ import { CountriesModule } from './countries/countries.module';
     CountriesModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

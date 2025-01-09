@@ -4,7 +4,7 @@ import { BaseCountry, CountryInfo } from './interfaces/country.interface';
 
 @Controller('countries')
 export class CountriesController {
-  constructor(private readonly countriesService: CountriesService) { }
+  constructor(private readonly countriesService: CountriesService) {}
 
   @Get()
   getAvailableCountries(): Promise<BaseCountry[]> {

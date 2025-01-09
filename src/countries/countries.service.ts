@@ -1,15 +1,21 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpClientService } from './http.service';
-import { BaseCountry, CountryInfo, CountryBorderResponse, CountryPopulationResponse, CountryFlagResponse } from './interfaces/country.interface';
+import {
+  BaseCountry,
+  CountryInfo,
+  CountryBorderResponse,
+  CountryPopulationResponse,
+  CountryFlagResponse,
+} from './interfaces/country.interface';
 
 @Injectable()
 export class CountriesService {
-  constructor(private readonly httpClient: HttpClientService) { }
+  constructor(private readonly httpClient: HttpClientService) {}
 
   async getAvailableCountries(): Promise<BaseCountry[]> {
     try {
       const countries = await this.httpClient.get<BaseCountry[]>(
-        this.httpClient.getDateNagerUrl('/AvailableCountries')
+        this.httpClient.getDateNagerUrl('/AvailableCountries'),
       );
 
       const countriesWithFlags = await Promise.all(
@@ -19,22 +25,25 @@ export class CountriesService {
             const flagUrl = await this.getFlagUrl(borderInfo.commonName);
             return {
               ...country,
-              flagUrl
+              flagUrl,
             };
           } catch (error) {
             console.error(`Error fetching flag for ${country.name}:`, error);
             return {
               ...country,
-              flagUrl: ''
+              flagUrl: '',
             };
           }
-        })
+        }),
       );
 
       return countriesWithFlags;
     } catch (error) {
       console.error('Error fetching available countries:', error);
-      throw new HttpException('Failed to fetch available countries', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Failed to fetch available countries',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -53,14 +62,17 @@ export class CountriesService {
           return {
             countryCode: border.countryCode,
             name: border.commonName,
-            flagUrl: borderFlag
+            flagUrl: borderFlag,
           };
         } catch (error) {
-          console.error(`Error getting flag for border country ${border.commonName}:`, error);
+          console.error(
+            `Error getting flag for border country ${border.commonName}:`,
+            error,
+          );
           return {
             countryCode: border.countryCode,
             name: border.commonName,
-            flagUrl: ''
+            flagUrl: '',
           };
         }
       });
@@ -78,21 +90,23 @@ export class CountriesService {
       console.error('Error fetching country info:', error);
       throw new HttpException(
         'Failed to fetch country information',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  private async getBorderInfo(countryCode: string): Promise<CountryBorderResponse> {
+  private async getBorderInfo(
+    countryCode: string,
+  ): Promise<CountryBorderResponse> {
     try {
       return await this.httpClient.get<CountryBorderResponse>(
-        this.httpClient.getDateNagerUrl(`/CountryInfo/${countryCode}`)
+        this.httpClient.getDateNagerUrl(`/CountryInfo/${countryCode}`),
       );
     } catch (error) {
       console.error('Error fetching border info:', error);
       throw new HttpException(
         'Failed to fetch border information',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -101,14 +115,14 @@ export class CountriesService {
     try {
       const response = await this.httpClient.post<CountryPopulationResponse>(
         this.httpClient.getCountriesNowUrl('/countries/population'),
-        { country: countryName }
+        { country: countryName },
       );
 
       if (response.error) {
         throw new HttpException(response.msg, HttpStatus.BAD_REQUEST);
       }
 
-      return response.data.populationCounts.map(count => ({
+      return response.data.populationCounts.map((count) => ({
         year: parseInt(count.year),
         value: parseInt(count.value),
       }));
@@ -122,7 +136,7 @@ export class CountriesService {
     try {
       const response = await this.httpClient.post<CountryFlagResponse>(
         this.httpClient.getCountriesNowUrl('/countries/flag/images'),
-        { country: countryName }
+        { country: countryName },
       );
 
       if (response.error) {
