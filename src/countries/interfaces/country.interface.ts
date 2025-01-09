@@ -3,8 +3,12 @@ export interface BaseCountry {
   name: string;
 }
 
+export interface BorderCountry extends BaseCountry {
+  flagUrl: string;
+}
+
 export interface CountryInfo extends BaseCountry {
-  borders: string[];
+  borders: BorderCountry[];
   population: PopulationData[];
   flagUrl: string;
 }
@@ -14,12 +18,20 @@ export interface PopulationData {
   value: number;
 }
 
+export interface CountryBorderInfo {
+  commonName: string;
+  officialName: string;
+  countryCode: string;
+  region: string;
+  borders: null | any[];
+}
+
 export interface CountryBorderResponse {
   commonName: string;
   officialName: string;
   countryCode: string;
   region: string;
-  borders: string[];
+  borders: CountryBorderInfo[];
 }
 
 export interface CountryPopulationResponse {
